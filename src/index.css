@@ -1,0 +1,15 @@
+:root {
+  --primary: #E54065;
+  --bg-primary: #f4f5f9;
+  --bg-secondary: #f2f2f2;
+  --border: #cfd2dc;
+  --text: #636363;
+  --text-filter: #e1e4ea;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  background-color: var(--bg-primary);
+}
