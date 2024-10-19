@@ -1,39 +1,58 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Styles from "./emailBody.module.css";
 import ProfileIcon from "../ProfileIcon";
+import formatDate from "../../utils/getDateTime";
+import removeHTMLTags from "../../utils/parseHTMLFromString";
+import ErrorHandler from "../ErrorHandler";
 
-const EmailBody = () => {
+const EmailBody = ({ email, handleFav }) => {
+  const [emailData, setEmailData] = useState({});
+  const [error, setError] = useState(null);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `https://flipkart-email-mock.now.sh/?id=${email.id}`
+      );
+      const data = await response.json();
+      setEmailData({ ...data });
+    } catch (error) {
+      setError(error.message);
+    }
+  }, [email.id]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (error) {
+    return <ErrorHandler error={error} />;
+  }
+
   return (
     <section className={Styles.emailContainer}>
       <aside>
-        <ProfileIcon profileName={"foo"} />
+        <ProfileIcon profileName={email.from.name} />
       </aside>
       <section className={Styles.emailSection}>
         <header className={Styles.emailHeader}>
           <div>
-            <h2>Lorem ipsum</h2>
-            <div className={Styles.fav}>Mark as Favourite</div>
+            <h2>{email.subject}</h2>
+
+            <button
+              className={Styles.fav}
+              style={{
+                backgroundColor: email.favorite ? "#636363" : "#E54065",
+              }}
+              onClick={() => handleFav(email)}
+            >
+              {email.favorite ? "Remove from favorite" : "Mark as favorite"}
+            </button>
           </div>
-          <p>Saturday, 19 October 2024</p>
+          <p>{formatDate(new Date(email.date))}</p>
         </header>
-        <article>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt esse
-          voluptas deserunt at earum vel recusandae vero nam, eius sint unde
-          praesentium quis fugiat enim illo. Porro nam reiciendis ipsam est a
-          nihil, temporibus sed corporis impedit ab praesentium quos dolorem
-          esse animi! Quisquam soluta accusamus inventore eum enim cum,
-          perferendis ipsam molestias nulla fugit cumque praesentium! Velit
-          expedita tempore voluptatibus maxime dolore pariatur dicta libero
-          voluptate at. Beatae corporis nulla fuga praesentium cum, dolorum
-          harum minus explicabo laudantium doloribus. Dolores laborum vero
-          voluptatum aut repudiandae ducimus reiciendis quia officia saepe
-          obcaecati nobis optio velit facilis itaque deserunt, corporis, modi
-          possimus voluptatibus! Aut quibusdam dolorem at tempora eveniet
-          dolore. Hic dicta amet nostrum ipsum unde perspiciatis sint optio,
-          magni vero excepturi placeat nesciunt debitis odit nisi sit esse
-          veritatis iure eligendi deleniti nihil natus doloribus, quaerat
-          minima. Deserunt eius qui accusamus eaque quisquam, commodi officiis
-          architecto repudiandae ducimus nam quod!
+        <article className={Styles.emailBody}>
+          {removeHTMLTags(emailData.body)}
         </article>
       </section>
     </section>

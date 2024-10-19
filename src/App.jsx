@@ -1,77 +1,96 @@
 import React, { useEffect, useState } from "react";
-<<<<<<< HEAD
-import EmailList from "./coponents/emailList";
-import "./App.css";
-=======
 import EmailList from "./components/emailList";
 import "./App.css";
 import EmailBody from "./components/email body/EmailBody";
->>>>>>> origin/main
+import Filter from "./components/filter/Filter";
+import ErrorHandler from "./components/ErrorHandler";
 
 function App() {
   const [emailData, setEmailData] = useState([]);
   const [error, setError] = useState(null);
-<<<<<<< HEAD
-=======
   const [showEmailBody, setShowEmailBody] = useState(false);
->>>>>>> origin/main
+  const [singleEmail, setSingleEmail] = useState({});
+  const [activeEmail, setActiveEmail] = useState(null);
 
-  // fetching emaillist
+  // fetching email List
   const fetchData = async () => {
-    const response = await fetch("https://flipkart-email-mock.vercel.app/");
-    return await response.json();
+    try {
+      const response = await fetch("https://flipkart-email-mock.vercel.app/");
+      const data = await response.json();
+      setEmailData([...data.list]);
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   useEffect(() => {
-    fetchData()
-      .then((dataList) => {
-        console.log(dataList.list);
-        setEmailData([...dataList.list]);
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
+    fetchData();
   }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // Requesting email body
+  const handleEmailBodyReq = (email) => {
+    setShowEmailBody(true);
+    email.read = true;
+    setActiveEmail(email.id);
+    setSingleEmail({ ...email });
+  };
+
+  //handle add/remove Favorite
+  const handleFav = (targetEmail) => {
+    const updateEmailData = emailData.map((email) => {
+      return email.id === targetEmail.id
+        ? { ...email, favorite: !targetEmail.favorite }
+        : email;
+    });
+    setEmailData(updateEmailData);
+    setSingleEmail({ ...targetEmail, favorite: !targetEmail.favorite });
+  };
+
+  const handleFilter = (filterBy) => {
+    if (filterBy === "Read") {
+      const updatedList = emailData.filter((item) => {
+        return item.read === true;
+      });
+      setEmailData(updatedList);
+    } else if (filterBy === "Unread") {
+      const updatedList = emailData.filter((item) => {
+        return item.read !== true;
+      });
+      setEmailData(updatedList);
+    } else if (filterBy === "Favorites") {
+      const updatedList = emailData.filter((item) => {
+        return item.favorite === true;
+      });
+      setEmailData(updatedList);
+    } else {
+      setError("Please select valid filters");
+    }
+  };
+
   if (error) {
-    return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "8rem",
-          color: "red",
-          fontWeight: "bold",
-          backdropFilter: "blur",
-          fontSize: "3rem",
-        }}
-      >
-        {error}
-      </div>
-    );
+    return <ErrorHandler error={error} />;
   }
 
   return (
     <main className="container">
-      <div>filter</div>
-<<<<<<< HEAD
-      <EmailList emailData={emailData} />
-=======
-      <div
-        style={{
-          display: "flex",
-          gap: "1.5rem",
-          justifyContent: "space-between",
-        }}
-      >
-        <div>
-          <EmailList emailData={emailData} />
+      <Filter handleFilter={handleFilter} />
+      <div className={showEmailBody ? "emailMainContainer" : null}>
+        <div className={showEmailBody ? "emailListSection" : null}>
+          <EmailList
+            emailData={emailData}
+            handleEmailBodyReq={handleEmailBodyReq}
+            showEmailBody={showEmailBody}
+            activeEmail={activeEmail}
+          />
         </div>
-        <EmailBody />
+        {showEmailBody && (
+          <EmailBody email={singleEmail} handleFav={handleFav} />
+        )}
       </div>
->>>>>>> origin/main
     </main>
   );
 }

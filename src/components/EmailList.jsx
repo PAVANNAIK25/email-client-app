@@ -1,11 +1,24 @@
 import React from "react";
-import Email from "./singleEmail/Email";
+import Email from "./single email/Email";
 
-const EmailList = ({ emailData }) => {
+const EmailList = ({
+  emailData,
+  handleEmailBodyReq,
+  showEmailBody,
+  activeEmail,
+}) => {
   return (
     <>
       {emailData.map((item, index) => {
-        return <Email key={index} email={item} />;
+        return (
+          <Email
+            key={index}
+            email={item}
+            handleEmailBodyReq={handleEmailBodyReq}
+            showEmailBody={showEmailBody}
+            isActiveEmail={activeEmail === item.id}
+          />
+        );
       })}
     </>
   );

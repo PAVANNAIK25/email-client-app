@@ -1,5 +1,16 @@
 .container {
     width: 95%;
     margin-left: 2.5%;
-    padding-top: 5%;
+    padding-top: 3%;
+}
+
+.emailListSection {
+    height: 90vh;
+    overflow-y: scroll;
+}
+
+.emailMainContainer {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
 }

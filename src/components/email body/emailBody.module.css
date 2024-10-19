@@ -1,48 +1,58 @@
-
-.emailContainer h2{
-    margin:0px;
-    padding:0px;
+.emailContainer h2 {
+    margin: 0px;
+    padding: 0px;
     color: var(--text)
 }
 
-aside{
-    width:8%;
+aside {
+    width: 9%;
+    min-width: 60px;
 }
 
-.emailSection{
-    width:80%;
-}
-.fav{
-    color:#fff;
+.fav {
+    color: #fff;
+    text-align: center;
     padding: 8px 15px;
-    background-color:var(--primary);
-    border-radius:10px;
+    font-size: 0.8rem;
+    letter-spacing: 0.035rem;
+    background-color: var(--primary);
+    border-radius: 20px;
+    outline: none;
+    border: none;
+    cursor: pointer;
 }
 
-.emailContainer{
-    margin-top:10px;
-    width:70%;
+.emailContainer {
+    margin-top: 10px;
+    width: 60%;
     background-color: #fff;
-    border-radius:10px;
-    height:max-content;
-    padding:1rem;
-    display:flex;
-    align-items:start;
-    gap:0.5rem;
+    border-radius: 10px;
+    height: max-content;
+    padding: 1rem;
+    display: flex;
+    align-items: start;
+    gap: 0.5rem;
+    border: 1px solid var(--border);
 
 }
 
-.emailHeader{
-    display:flex;
-    flex-direction:column;
-
+.emailSection {
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.emailHeader > div{
-    display:flex;
+.emailHeader {
+    display: flex;
+    flex-direction: column;
+}
+
+.emailHeader>div {
+    display: flex;
     justify-content: space-between;
 }
 
-.fav{
-
+.emailBody {
+    padding-bottom: 0.5rem;
 }
