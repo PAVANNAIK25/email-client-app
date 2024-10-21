@@ -4,6 +4,7 @@ import "./App.css";
 import EmailBody from "./components/email body/EmailBody";
 import Filter from "./components/filter/Filter";
 import ErrorHandler from "./components/ErrorHandler";
+import Pagination from "./components/pagination/Pagination";
 
 function App() {
   const [emailData, setEmailData] = useState([]);
@@ -11,6 +12,9 @@ function App() {
   const [showEmailBody, setShowEmailBody] = useState(false);
   const [singleEmail, setSingleEmail] = useState({});
   const [activeEmail, setActiveEmail] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [pageNumber, setPageNumber] = useState(1);
 
   // fetching email List
   const fetchData = async () => {
@@ -18,14 +22,12 @@ function App() {
       const response = await fetch("https://flipkart-email-mock.vercel.app/");
       const data = await response.json();
       setEmailData([...data.list]);
+      setFilteredData([...data.list]);
+      setTotalPages(Math.ceil(data.total / 10));
     } catch (error) {
       setError(error.message);
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   useEffect(() => {
     fetchData();
@@ -40,6 +42,7 @@ function App() {
   };
 
   //handle add/remove Favorite
+
   const handleFav = (targetEmail) => {
     const updateEmailData = emailData.map((email) => {
       return email.id === targetEmail.id
@@ -47,28 +50,33 @@ function App() {
         : email;
     });
     setEmailData(updateEmailData);
+    setFilteredData((prevFilterData) => {
+      const update = prevFilterData.map((item) => {
+        if (item.id === targetEmail.id) {
+          return { ...item, favorite: !item.favorite };
+        } else {
+          return item;
+        }
+      });
+      return update;
+    });
+
     setSingleEmail({ ...targetEmail, favorite: !targetEmail.favorite });
   };
 
   const handleFilter = (filterBy) => {
+    let filteredList = [];
     if (filterBy === "Read") {
-      const updatedList = emailData.filter((item) => {
-        return item.read === true;
-      });
-      setEmailData(updatedList);
+      filteredList = emailData.filter((item) => item.read);
     } else if (filterBy === "Unread") {
-      const updatedList = emailData.filter((item) => {
-        return item.read !== true;
-      });
-      setEmailData(updatedList);
+      filteredList = emailData.filter((item) => !item.read);
     } else if (filterBy === "Favorites") {
-      const updatedList = emailData.filter((item) => {
-        return item.favorite === true;
-      });
-      setEmailData(updatedList);
+      filteredList = emailData.filter((item) => item.favorite);
     } else {
       setError("Please select valid filters");
+      return;
     }
+    setFilteredData(filteredList);
   };
 
   if (error) {
@@ -81,7 +89,7 @@ function App() {
       <div className={showEmailBody ? "emailMainContainer" : null}>
         <div className={showEmailBody ? "emailListSection" : null}>
           <EmailList
-            emailData={emailData}
+            emailData={filteredData}
             handleEmailBodyReq={handleEmailBodyReq}
             showEmailBody={showEmailBody}
             activeEmail={activeEmail}
@@ -91,6 +99,7 @@ function App() {
           <EmailBody email={singleEmail} handleFav={handleFav} />
         )}
       </div>
+      <Pagination totalPages={totalPages} pageNumber={pageNumber} />
     </main>
   );
 }
